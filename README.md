@@ -47,8 +47,7 @@ This library intentionally does not provide packages so that each API client can
 
 We recommend the use of `nyholm/psr7` and `php-http/guzzle6-adapter`.
 
-For production use: `composer require nyholm/psr7 php-http/guzzle6-adapter`
-
+For production use: `composer require nyholm/psr7 php-http/guzzle6-adapter` <br>
 For development use: `composer require --dev nyholm/psr7 php-http/guzzle6-adapter`
 
 ## Usage
