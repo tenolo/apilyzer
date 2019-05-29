@@ -259,7 +259,7 @@ abstract class Gateway implements GatewayInterface
         $this->getReceivedData($call);
 
         if ($this->config->isDebugMode()) {
-            $this->log($call);
+            $this->dumpCall($call);
         }
 
         return $call;
@@ -392,12 +392,17 @@ abstract class Gateway implements GatewayInterface
     /**
      * @param CallInterface $call
      */
-    protected function log(CallInterface $call)
+    protected function dumpCall(CallInterface $call): void
     {
         $endpoint = $call->getEndpoint();
         $name = $endpoint::getName();
 
-        $dir = __DIR__.'/../../log';
+        $dir = $this->config->getDebugVarDumperDirectory();
+
+        if ($dir === null) {
+            return;
+        }
+
         $path = $dir.'/'.$name.'_'.Carbon::now()->format('Ymd_His').'.html';
 
         try {
@@ -421,6 +426,11 @@ abstract class Gateway implements GatewayInterface
         } catch (\Exception $e) {
             // do nothing
         }
+    }
+
+    protected function getLogDir(): ?string
+    {
+        return null;
     }
 
     /**

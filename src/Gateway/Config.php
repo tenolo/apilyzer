@@ -117,4 +117,12 @@ abstract class Config implements ConfigInterface
     {
         $this->debugMode = $debugMode;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getDebugVarDumperDirectory(): ?string
+    {
+        return null;
+    }
 }

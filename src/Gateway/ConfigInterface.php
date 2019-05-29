@@ -45,4 +45,9 @@ interface ConfigInterface
      * @inheritdoc
      */
     public function setDebugMode(bool $debugMode): void;
+
+    /**
+     * @inheritdoc
+     */
+    public function getDebugVarDumperDirectory(): ?string;
 }
