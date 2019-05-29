@@ -54,3 +54,69 @@ For development use: `composer require --dev nyholm/psr7 php-http/guzzle6-adapte
 
 ### First Steps
 
+Create your own `Gateway` and `Config` class.
+
+```php
+<?php
+
+namespace App\Api\Gateway;
+
+use Tenolo\Apilyzer\Gateway\Config as BaseConfig;
+
+/**
+ * Class Config
+ */
+class Config extends BaseConfig
+{
+
+    /**
+     * @inheritDoc
+     */
+    public function getGatewayUrl(): string
+    {
+        return 'https://BASE.URL.TO.API.com/';
+    }
+}
+
+```
+
+```php
+<?php
+
+namespace App\Api\Gateway;
+
+use Tenolo\Apilyzer\Gateway\Gateway as BaseGateway;
+use Tenolo\Apilyzer\Manager\EndpointManager;
+use Tenolo\Apilyzer\Manager\EndpointManagerInterface;
+
+/**
+ * Class Gateway
+ */
+class Gateway extends BaseGateway
+{
+
+    /** @var EndpointManagerInterface */
+    protected $endpointManager;
+
+    /**
+     * @inheritDoc
+     */
+    protected function getEndpointManager(): EndpointManagerInterface
+    {
+        if ($this->endpointManager === null) {
+            $this->endpointManager = $this->createEndpointManager();
+        }
+
+        return $this->endpointManager;
+    }
+    
+    /**
+    * @return EndpointManagerInterface
+    */
+    protected function createEndpointManager(): EndpointManagerInterface 
+    {
+        return new EndpointManager(__DIR__.'/../Endpoint');
+    }
+}
+
+```
