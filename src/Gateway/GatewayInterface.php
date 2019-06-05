@@ -4,6 +4,7 @@ namespace Tenolo\Apilyzer\Gateway;
 
 use Http\Message\Authentication;
 use Tenolo\Apilyzer\Call\CallInterface;
+use Tenolo\Apilyzer\Call\CallRequest;
 
 /**
  * Interface GatewayInterface
@@ -14,6 +15,13 @@ use Tenolo\Apilyzer\Call\CallInterface;
  */
 interface GatewayInterface
 {
+
+    /**
+     * @param CallRequest $request
+     *
+     * @return CallInterface
+     */
+    public function request(CallRequest $request): CallInterface;
 
     /**
      * @param string              $name

@@ -2,6 +2,7 @@
 
 namespace Tenolo\Apilyzer\Collection;
 
+use Ramsey\Collection\Collection as RamCollection;
 use Ramsey\Collection\Exception\InvalidArgumentException;
 
 /**
@@ -11,7 +12,7 @@ use Ramsey\Collection\Exception\InvalidArgumentException;
  * @author  Nikita Loges
  * @company tenolo GmbH & Co. KG
  */
-class Collection extends \Ramsey\Collection\Collection
+class Collection extends RamCollection implements CollectionInterface
 {
     /**
      * @inheritDoc
@@ -36,10 +37,9 @@ class Collection extends \Ramsey\Collection\Collection
     }
 
     /**
-     * @param $name
-     * @param $value
+     * @inheritDoc
      */
-    public function set($name, $value): void
+    public function set(string $name, $value): void
     {
         $this->offsetSet($name, $value);
     }

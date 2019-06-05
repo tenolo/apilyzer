@@ -15,7 +15,6 @@ use Http\Message\Authentication;
 use Psr\Http\Message\RequestInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Ramsey\Collection\CollectionInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -31,8 +30,10 @@ use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Tenolo\Apilyzer\Call\Call;
 use Tenolo\Apilyzer\Call\CallInterface;
 use Tenolo\Apilyzer\Call\CallPlugin;
+use Tenolo\Apilyzer\Call\CallRequest;
 use Tenolo\Apilyzer\Call\PreparedRequest;
 use Tenolo\Apilyzer\Collection\Collection;
+use Tenolo\Apilyzer\Collection\CollectionInterface;
 use Tenolo\Apilyzer\Endpoint\EndpointInterface;
 use Tenolo\Apilyzer\Endpoint\MapResponseInterface;
 use Tenolo\Apilyzer\Endpoint\ResponseErrorInterface;
@@ -105,8 +106,29 @@ abstract class Gateway implements GatewayInterface
     /**
      * @inheritdoc
      */
-    public function call(string $name, $body = null, array $options = [], array $headers = [], array $plugins = [], Authentication $authentication = null): CallInterface
+    public function request(CallRequest $request): CallInterface
     {
+        return $this->call(
+            $request->getEndpoint(),
+            $request->getBody(),
+            $request->getOptions(),
+            $request->getHeaders(),
+            $request->getPlugins(),
+            $request->getAuthentication()
+        );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function call(
+        string $name,
+        $body = null,
+        array $options = [],
+        array $headers = [],
+        array $plugins = [],
+        Authentication $authentication = null
+    ): CallInterface {
         // basic vars
         $eventDispatcher = $this->getEventDispatcher();
 
@@ -136,23 +158,25 @@ abstract class Gateway implements GatewayInterface
 
         // check if there is any data to submit in the request body and serialize it
         if ($endpoint->supportsSerialization($options)) {
-            if ($endpoint->serializationIsRequired($options) && !$body->hasOriginal()) {
-                throw new \RuntimeException('body for endpoint '.get_class($endpoint).' can not be empty');
-            }
-
-            $typeFound = false;
             $types = new Collection('mixed');
             $endpoint->getSerializationTypes($types);
 
-            foreach ($types->toArray() as $type) {
-                if ($body->getOriginal() instanceof $type) {
-                    $typeFound = true;
-                    break;
-                }
+            if ($endpoint->serializationIsRequired($options) && !$body->hasOriginal() && !$types->isEmpty()) {
+                throw new \RuntimeException('body for endpoint '.get_class($endpoint).' can not be empty');
             }
 
-            if ($typeFound === false) {
-                throw new \RuntimeException('body for endpoint '.get_class($endpoint).' has to be one type of following: '.implode(', ', $types->toArray()));
+            if (!$types->isEmpty()) {
+                $typeFound = false;
+                foreach ($types->toArray() as $type) {
+                    if ($body->getOriginal() instanceof $type) {
+                        $typeFound = true;
+                        break;
+                    }
+                }
+
+                if ($typeFound === false) {
+                    throw new \RuntimeException('body for endpoint '.get_class($endpoint).' has to be one type of following: '.implode(', ', $types->toArray()));
+                }
             }
 
             if ($body->hasOriginal()) {
@@ -346,6 +370,35 @@ abstract class Gateway implements GatewayInterface
         if ($endpoint instanceof ResponseErrorInterface) {
             $endpoint->onResponseError($call, $serializer);
         }
+
+        if ($call->getStatus() >= 400) {
+            $data = $call->getReceivedData();
+
+            $receivedOriginalData = $data->getOriginal();
+            $deserializationType = $this->getErrorDeserializationType();
+            $deserializationFormat = $this->getErrorDeserializationFormat();
+
+            if ($deserializationType !== null) {
+                $receivedData = $serializer->deserialize($receivedOriginalData, $deserializationType, $deserializationFormat);
+                $data->setNormalized($receivedData);
+            }
+        }
+    }
+
+    /**
+     * @return string|null
+     */
+    protected function getErrorDeserializationType(): ?string
+    {
+        return null;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getErrorDeserializationFormat(): string
+    {
+        return 'json';
     }
 
     /**

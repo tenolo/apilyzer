@@ -3,7 +3,7 @@
 namespace Tenolo\Apilyzer\Endpoint;
 
 use Psr\Http\Message\ResponseInterface;
-use Ramsey\Collection\CollectionInterface;
+use Tenolo\Apilyzer\Collection\CollectionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\Route;
 

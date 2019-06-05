@@ -113,14 +113,6 @@ class Call implements CallInterface
     }
 
     /**
-     * @inheritdoc
-     */
-    public function isSubmitted(): bool
-    {
-        return null !== $this->getResponse();
-    }
-
-    /**
      * @inheritDoc
      */
     public function getSubmittedData(): Data
@@ -189,10 +181,6 @@ class Call implements CallInterface
      */
     public function isSuccessful(): bool
     {
-        if (!$this->isSubmitted()) {
-            return false;
-        }
-
         $statusCode = $this->getResponse()->getStatusCode();
 
         return ($statusCode >= 200 && $statusCode < 300);
@@ -203,10 +191,6 @@ class Call implements CallInterface
      */
     public function isForwarding(): bool
     {
-        if (!$this->isSubmitted()) {
-            return false;
-        }
-
         $statusCode = $this->getResponse()->getStatusCode();
 
         return ($statusCode >= 300 && $statusCode < 400);
@@ -217,10 +201,6 @@ class Call implements CallInterface
      */
     public function isError(): bool
     {
-        if ($this->hasError()) {
-            return true;
-        }
-
         if ($this->isClientError()) {
             return true;
         }
@@ -250,30 +230,6 @@ class Call implements CallInterface
         $statusCode = $this->getResponse()->getStatusCode();
 
         return ($statusCode >= 500 && $statusCode < 600);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function hasError(): bool
-    {
-        return null !== $this->errors;
-    }
-
-    /**
-     * @param mixed $errors
-     */
-    public function setErrors($errors)
-    {
-        $this->errors = $errors;
-    }
-
-    /**
-     * @return null
-     */
-    public function getErrors()
-    {
-        return $this->errors;
     }
 
     /**

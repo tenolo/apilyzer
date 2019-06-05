@@ -47,11 +47,6 @@ interface CallInterface
     public function getReasonPhrase(): ?string;
 
     /**
-     * @return bool
-     */
-    public function isSubmitted(): bool;
-
-    /**
      * @return Data
      */
     public function getSubmittedData(): Data;

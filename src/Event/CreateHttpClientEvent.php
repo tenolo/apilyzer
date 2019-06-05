@@ -4,7 +4,7 @@ namespace Tenolo\Apilyzer\Event;
 
 use Http\Client\Common\Plugin;
 use Http\Client\HttpClient;
-use Ramsey\Collection\CollectionInterface;
+use Tenolo\Apilyzer\Collection\CollectionInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Tenolo\Apilyzer\Endpoint\EndpointInterface;
 
