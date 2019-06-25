@@ -97,6 +97,8 @@ class EndpointFinder
         $lines = file($filename);
         $reg = preg_grep('/^namespace /', $lines);
         $namespaceLine = array_shift($reg);
+        $namespaceLine = str_replace(["\r", "\n"], '', $namespaceLine);
+
         $match = [];
         preg_match('/^namespace (.*);$/', $namespaceLine, $match);
 
