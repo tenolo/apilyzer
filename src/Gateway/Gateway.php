@@ -87,6 +87,14 @@ abstract class Gateway implements GatewayInterface
     abstract protected function getEndpointManager(): EndpointManagerInterface;
 
     /**
+     * @return ConfigInterface
+     */
+    public function getConfig(): ConfigInterface
+    {
+        return $this->config;
+    }
+
+    /**
      * @param EndpointInterface   $endpoint
      * @param CollectionInterface $plugins
      *
@@ -436,7 +444,7 @@ abstract class Gateway implements GatewayInterface
         $resolver = new OptionsResolver();
         $endpoint->configureOptions($resolver);
 
-        $event = new ConfigureEndpointOptionsEvent($endpoint, $resolver, $options);
+        $event = new ConfigureEndpointOptionsEvent($endpoint, $this->getConfig(), $resolver, $options);
         $eventDispatcher->dispatch(ConfigureEndpointOptionsEvent::class, $event);
 
         return $resolver->resolve($options);

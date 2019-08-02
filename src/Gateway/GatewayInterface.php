@@ -17,6 +17,11 @@ interface GatewayInterface
 {
 
     /**
+     * @return ConfigInterface
+     */
+    public function getConfig(): ConfigInterface;
+
+    /**
      * @param CallRequest $request
      *
      * @return CallInterface

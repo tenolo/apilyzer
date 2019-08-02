@@ -5,6 +5,7 @@ namespace Tenolo\Apilyzer\Event;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Tenolo\Apilyzer\Endpoint\EndpointInterface;
+use Tenolo\Apilyzer\Gateway\ConfigInterface;
 
 /**
  * Class ConfigureEndpointOptionsEvent
@@ -22,17 +23,26 @@ class ConfigureEndpointOptionsEvent extends Event
     /** @var OptionsResolver */
     protected $resolver;
 
+    /** @var ConfigInterface */
+    protected $config;
+
     /** @var array */
     protected $options;
 
     /**
      * @param EndpointInterface $endpoint
+     * @param ConfigInterface   $config
      * @param OptionsResolver   $resolver
      * @param array             $options
      */
-    public function __construct(EndpointInterface $endpoint, OptionsResolver $resolver, array $options = [])
-    {
+    public function __construct(
+        EndpointInterface $endpoint,
+        ConfigInterface $config,
+        OptionsResolver $resolver,
+        array $options = []
+    ) {
         $this->endpoint = $endpoint;
+        $this->config = $config;
         $this->resolver = $resolver;
         $this->options = $options;
     }
@@ -43,6 +53,14 @@ class ConfigureEndpointOptionsEvent extends Event
     public function getEndpoint(): EndpointInterface
     {
         return $this->endpoint;
+    }
+
+    /**
+     * @return ConfigInterface
+     */
+    public function getConfig(): ConfigInterface
+    {
+        return $this->config;
     }
 
     /**
